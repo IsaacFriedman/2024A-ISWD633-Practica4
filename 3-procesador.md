@@ -11,6 +11,10 @@ Asignar núcleos de CPU específicos:
 
 **¿Como saber el numero de procesadores virtuales que tiene una máquina?**
 
+```
+--docker stats <nombre del contenedor>
+```
+
 ### Para crear y ejecutar los siguientes contenedores usar la imagen de nginx:alpine
 
 Limitar el uso de CPU a 1.5 núcleos
