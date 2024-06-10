@@ -51,10 +51,11 @@ La opción -t se utiliza para etiquetar la imagen que se está construyendo con 
  
 ### Ejecutar el archivo Dockerfile y construir una imagen en la versión 1.0
 ```
-
+docker build -t dockerfile .
 ```
 
 **¿Cuántos pasos se han ejecutado?**
+6 pasos en total
 
 ### Inspeccionar la imagen creada
 # COMPLETAR CON UNA CAPTURA
