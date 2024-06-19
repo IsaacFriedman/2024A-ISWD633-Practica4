@@ -125,17 +125,13 @@ docker run -d -P --name contenedor1 dockerfile:1.0
 ### ¿Con que puerto host se está realizando el mapeo?
 
 ```
-docker port contenedor1
+docker port <nombre del contenedor>
 ```
-
-
-![mapeo](imagenes/3.png)
-
 
 El mapeo se esta realizando con el puerto 32768.
 
 
-![mapeo](imagenes/4.png)
+![mapeo](imagenes/3.png)
 
 
 **¿Qué es una imagen huérfana?**
