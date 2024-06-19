@@ -46,22 +46,63 @@ La opción -t se utiliza para etiquetar la imagen que se está construyendo con 
 ![mapeo](imagenes/dockerfile.PNG)
 
 - apachectl: Es el script de control para el servidor web Apache. Se utiliza para iniciar, detener y controlar el servidor web.
+  
+
 - -D FOREGROUND: Esta opción le dice a Apache que se ejecute en primer plano. Por defecto, Apache se ejecuta como un servicio en segundo plano. Sin embargo, en un contenedor Docker, es preferible que el proceso principal (en este caso, Apache) se ejecute en primer plano para que Docker pueda monitorear el estado del proceso. Si Apache se ejecutara en segundo plano, Docker no podría saber si el servidor web está funcionando correctamente o no.
 
  
 ### Ejecutar el archivo Dockerfile y construir una imagen en la versión 1.0
 ```
-docker build -t dockerfile .
+docker build -t dockerfile:1.0 .
 ```
 
+
+![mapeo](imagenes/1.png)
+
+
 **¿Cuántos pasos se han ejecutado?**
-6 pasos en total
+
+
+Se han ejecutado 9 pasos:
+
+
+1. Carga la definición de construcción desde Dockerfile.
+2. Carga los metadatos para docker.io/library/centos:7.
+3. Carga .dockerignore.
+4. Transfiere el contexto.
+5. Ejecuta FROM docker.io/library/centos:7@sha256:be65f488b7764ad3638f23.
+6. Carga el contexto de construcción.
+7. Ejecuta RUN yum update -y.
+8. Ejecuta RUN yum install httpd -y.
+9. Ejecuta COPY ./web /var/www/html.
+
 
 ### Inspeccionar la imagen creada
-# COMPLETAR CON UNA CAPTURA
+
+
+![mapeo](imagenes/2.png)
+
 
 **Modificar el archivo index.html para incluir su nombre**
+
+
 **¿Cuántos pasos se han ejecutado? ¿Observa algo diferente en la creación de la imagen**
+
+Se han ejecutado 9 pasos en total para construir tu imagen Docker:
+
+1. Carga la definición de construcción desde Dockerfile.
+2. Carga los metadatos para docker.io/library/centos:7.
+3. Carga .dockerignore.
+4. Transfiere el contexto.
+5. Ejecuta FROM docker.io/library/centos:7@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4.
+6. Carga el contexto de construcción.
+7. Ejecuta RUN yum update -y (usando una versión en caché).
+8. Ejecuta RUN yum install httpd -y (usando una versión en caché).
+9. Ejecuta COPY ./web /var/www/html.
+
+
+En cuanto a las diferencias con la ejecución previa, parece que los pasos RUN yum update -y y RUN yum install httpd -y se han ejecutado utilizando una versión en caché (CACHED). Esto significa que Docker ha reutilizado los resultados de una ejecución anterior de estos comandos, lo que puede acelerar significativamente el proceso de construcción de la imagen.
+
 
 ## Mecanismo de caché
 Docker usa un mecanismo de caché cuando crea imágenes para acelerar el proceso de construcción y evitar la repetición de pasos que no han cambiado. Cada instrucción en un Dockerfile crea una capa en la imagen final. Docker intenta reutilizar las capas de una construcción anterior si no han cambiado, lo que reduce significativamente el tiempo de construcción.
@@ -69,36 +110,59 @@ Docker usa un mecanismo de caché cuando crea imágenes para acelerar el proceso
 - Instrucción FROM: Si la imagen base ya está en el sistema, Docker la reutiliza.
 - Instrucciones de configuración (ENV, RUN, COPY, etc.): Docker verifica si alguna instrucción ha cambiado. Si no, reutiliza la capa correspondiente de la caché.
 - Instrucción COPY y ADD: Si los archivos copiados no han cambiado, Docker reutiliza la capa de caché correspondiente.
+
+
 ![mapeo](imagenes/dockerfile-cache.PNG)
 
 ### Crear un contenedor a partir de las imagen creada, mapear todos los puertos
-```
+
 
 ```
+docker run -d -P --name contenedor1 dockerfile:1.0
+```
+
 
 ### ¿Con que puerto host se está realizando el mapeo?
-# COMPLETAR CON LA RESPUESTA
+
+```
+docker port contenedor1
+```
+
+
+![mapeo](imagenes/3.png)
+
+
+El mapeo se esta realizando con el puerto 32768.
+
+
+![mapeo](imagenes/4.png)
+
 
 **¿Qué es una imagen huérfana?**
-# COMPLETAR CON LA RESPUESTA
+
+
+En Docker, una imagen huérfana (o “dangling image”) es una imagen que ya no está asociada con ningún contenedor o con ninguna etiqueta de imagen. Esto puede suceder cuando construyes una nueva imagen con la misma etiqueta que una imagen existente. La imagen existente pierde su etiqueta y se convierte en una imagen huérfana.
+
+
+Las imágenes huérfanas pueden ocupar un espacio valioso en tu sistema, por lo que es una buena práctica eliminarlas de vez en cuando.
+
 
 ### Identificar imágenes huérfanas
 ```
-
+docker images -f "dangling=true"
 ```
 
 ### Listar los IDS de las imágenes huérfanas
 ```
-
+docker images -f "dangling=true" -q
 ```
 
 ### Eliminar imágenes huérfanas
 ```
-
+docker image prune
 ```
 
 ### Ejecutar un archivo Dockerfile que tiene otro nombre
 ```
-docker build -t <nombre imagen>:<version> -f <ruta y nommbre del Dockerfile> .
+docker build -t <nombre imagen>:<version> -f <ruta y nombre del Dockerfile> .
 ```
-
